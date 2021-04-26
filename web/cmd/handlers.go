@@ -3,7 +3,6 @@ package main
 import (
 	"html/template"
 	"net/http"
-	"regexp"
 	"strconv"
 )
 
@@ -110,22 +109,12 @@ func (app *application) signUpPagePOST(w http.ResponseWriter, r *http.Request) {
 	}
 	repPassword := r.FormValue("repPassword")
 
-	matched, _ := regexp.MatchString(regexEmail, usr.Email)
-	if !matched ||
-		usr.Name == "" ||
-		usr.Surname == "" ||
-		usr.Password == "" ||
-		usr.Password != repPassword {
-		http.Redirect(w, r, "/signUp/", http.StatusSeeOther)
-		return
-	}
-
-	uEmail, err := app.getUserByEmail(usr.Email)
+	valid, err := app.validUser(*usr, repPassword)
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
-	if uEmail != nil && uEmail.Id != usr.Id {
+	if !valid {
 		http.Redirect(w, r, "/signUp/", http.StatusSeeOther)
 		return
 	}
@@ -259,21 +248,13 @@ func (app *application) changeUserPOST(w http.ResponseWriter, r *http.Request) {
 		Password: usr.Password,
 	}
 
-	matched, _ := regexp.MatchString(regexEmail, newU.Email)
-	if !matched ||
-		newU.Name == "" ||
-		newU.Surname == "" {
-		http.Redirect(w, r, "/changeUser/", http.StatusSeeOther)
-		return
-	}
-
-	uEmail, err := app.getUserByEmail(newU.Email)
+	valid, err := app.validUser(*newU, newU.Password)
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
-	if uEmail != nil && uEmail.Id != newU.Id {
-		http.Redirect(w, r, "/changeUser/", http.StatusSeeOther)
+	if !valid {
+		http.Redirect(w, r, "/signUp/", http.StatusSeeOther)
 		return
 	}
 
