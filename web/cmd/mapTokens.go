@@ -1,22 +1,23 @@
 package main
 
 type UserAndTokens struct {
-	User   user
-	Tokens []token
+	User   User
+	Tokens []Token
 }
 
 //Карта, где хранятся все токены и  авторизированные пользователи
 //Ключ - это id пользователя, значение - это пользователь и его токены
-type mapTokens map[int]*UserAndTokens
+type MapTokens map[int]*UserAndTokens
 
-func newMapTokens() *mapTokens {
-	result := make(mapTokens)
+func newMapTokens() *MapTokens {
+	result := make(MapTokens)
 	return &result
 }
 
 //Обновление, передается пользователь, если он есть в карте, то обновляются его данные
-func (m *mapTokens) updateUser(u *user) {
+func (m *MapTokens) updateUser(u *User) {
 	id := u.Id
+
 	//Если его нет в карте, то ничего не делается
 	if (*m)[id] == nil {
 		return
@@ -25,13 +26,14 @@ func (m *mapTokens) updateUser(u *user) {
 }
 
 //Добавление, передается пользователь и токен
-func (m *mapTokens) add(u user, t token) {
+func (m *MapTokens) add(u User, t Token) {
 	id := u.Id
+
 	//Если этого пользователя нет в карте, создается новая запись с ним
 	if (*m)[id] == nil {
 		(*m)[id] = &UserAndTokens{
 			User:   u,
-			Tokens: []token{t},
+			Tokens: []Token{t},
 		}
 		//Если же он уже есть, то к списку его токенов добавляется новый
 	} else {
@@ -41,25 +43,28 @@ func (m *mapTokens) add(u user, t token) {
 }
 
 //Удаляются все токены и сам пользователь из карты
-func (m *mapTokens) clearById(id int) {
+func (m *MapTokens) clearById(id int) {
 	delete(*m, id)
 }
 
 //Удаляет токен пользователя из карты
-func (m *mapTokens) deleteByToken(t token) {
+func (m *MapTokens) deleteByToken(t Token) {
 	id := t.IdUser
+
 	//Если записи нет, то ничего не делаем
 	if (*m)[id] == nil {
 		return
 	}
+
 	//Пересобираем токены без учета удаляемого
-	var newSlice []token
+	var newSlice []Token
 	for _, el := range (*m)[id].Tokens {
 		if el.Token != t.Token {
 			newSlice = append(newSlice, el)
 		}
 	}
 	(*m)[id].Tokens = newSlice
+
 	//Если не осталось токенов, то удаляем запись в карте
 	if len(newSlice) == 0 {
 		delete(*m, id)
@@ -67,12 +72,14 @@ func (m *mapTokens) deleteByToken(t token) {
 }
 
 //Получаем хозяина токена, если он есть
-func (m mapTokens) getUserByToken(t token) *user {
+func (m MapTokens) getUserByToken(t Token) *User {
 	id := t.IdUser
+
 	//Если нет записи этого пользователя
 	if m[id] == nil {
 		return nil
 	}
+
 	//Перебираем все токены пользователя на предмет совпадения, чтобы вернуть искомый
 	for _, el := range m[id].Tokens {
 		if el.Token == t.Token {

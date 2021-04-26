@@ -6,15 +6,15 @@ import (
 
 const regexEmail = `^\w+@\w+[.]\w+$`
 
-type user struct {
-	Id int
-	Name string
-	Surname string
-	Email string
+type User struct {
+	Id       int
+	Name     string
+	Surname  string
+	Email    string
 	Password string
 }
 
-func (u *user) comparePassword(password string) error {
+func (u *User) comparePassword(password string) error {
 	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
 	if err == nil {
 		return nil
