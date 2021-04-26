@@ -31,14 +31,17 @@ func (app application) openDB() (*sql.DB, error) {
 	return db, nil
 }
 
-func (app application) getUserByEmail(email string) *User {
+func (app application) getUserByEmail(email string) (*User, error) {
 	row := app.DB.QueryRow("select * from users where email = $1", email)
 	usr := &User{}
 	err := row.Scan(&usr.Id, &usr.Name, &usr.Surname, &usr.Email, &usr.Password)
 	if err != nil {
-		return nil
+		if err.Error() == "sql: no rows in result set" {
+			return nil, nil
+		}
+		return nil, err
 	}
-	return usr
+	return usr, nil
 }
 
 func (app application) getAllUsers() ([]User, error) {

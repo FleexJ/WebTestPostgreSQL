@@ -120,13 +120,17 @@ func (app *application) signUpPagePOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uEmail := app.getUserByEmail(usr.Email)
+	uEmail, err := app.getUserByEmail(usr.Email)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
 	if uEmail != nil && uEmail.Id != usr.Id {
 		http.Redirect(w, r, "/signUp/", http.StatusSeeOther)
 		return
 	}
 
-	err := app.insertUser(usr)
+	err = app.insertUser(usr)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -170,7 +174,11 @@ func (app *application) signInPagePOST(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//auth user
-	usr := app.getUserByEmail(email)
+	usr, err := app.getUserByEmail(email)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
 	if usr == nil || usr.comparePassword(password) != nil {
 		http.Redirect(w, r, "/signIn/", http.StatusSeeOther)
 		return
@@ -259,13 +267,17 @@ func (app *application) changeUserPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uEmail := app.getUserByEmail(newU.Email)
+	uEmail, err := app.getUserByEmail(newU.Email)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
 	if uEmail != nil && uEmail.Id != newU.Id {
 		http.Redirect(w, r, "/changeUser/", http.StatusSeeOther)
 		return
 	}
 
-	err := app.updateUser(newU)
+	err = app.updateUser(newU)
 	if err != nil {
 		app.serverError(w, err)
 		return
