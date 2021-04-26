@@ -62,7 +62,7 @@ func (app application) getAllUsers() ([]User, error) {
 	return users, nil
 }
 
-func (app application) insertUser(usr *User) error {
+func (app application) insertUser(usr User) error {
 	bcryptPassw, err := bcrypt.GenerateFromPassword([]byte(usr.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
@@ -81,7 +81,7 @@ func (app application) insertUser(usr *User) error {
 	return nil
 }
 
-func (app application) updateUser(usr *User) error {
+func (app application) updateUser(usr User) error {
 	stmt, err := app.DB.Prepare("update users set name = $1, surname = $2, email = $3 where id = $4")
 	if err != nil {
 		return err
@@ -95,7 +95,7 @@ func (app application) updateUser(usr *User) error {
 	return nil
 }
 
-func (app application) updateUserPassword(usr *User, password string) error {
+func (app application) updateUserPassword(usr User, password string) error {
 	bcryptPassw, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
@@ -113,7 +113,7 @@ func (app application) updateUserPassword(usr *User, password string) error {
 	return nil
 }
 
-func (app application) deleteUser(usr *User) error {
+func (app application) deleteUser(usr User) error {
 	stmt, err := app.DB.Prepare("delete from users where id = $1")
 	if err != nil {
 		return err

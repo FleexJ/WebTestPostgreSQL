@@ -101,7 +101,7 @@ func (app *application) signUpPageGET(w http.ResponseWriter, r *http.Request) {
 
 //Обработка POST-запроса страницы регистрации
 func (app *application) signUpPagePOST(w http.ResponseWriter, r *http.Request) {
-	usr := &User{
+	usr := User{
 		Email:    r.FormValue("email"),
 		Name:     r.FormValue("name"),
 		Surname:  r.FormValue("surname"),
@@ -109,7 +109,7 @@ func (app *application) signUpPagePOST(w http.ResponseWriter, r *http.Request) {
 	}
 	repPassword := r.FormValue("repPassword")
 
-	valid, err := app.validUser(*usr, repPassword)
+	valid, err := app.validUser(usr, repPassword)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -240,7 +240,7 @@ func (app *application) changeUserPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newU := &User{
+	newU := User{
 		Id:       usr.Id,
 		Email:    r.FormValue("email"),
 		Name:     r.FormValue("name"),
@@ -248,7 +248,7 @@ func (app *application) changeUserPOST(w http.ResponseWriter, r *http.Request) {
 		Password: usr.Password,
 	}
 
-	valid, err := app.validUser(*newU, newU.Password)
+	valid, err := app.validUser(newU, newU.Password)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -318,13 +318,13 @@ func (app *application) changePasswordPOST(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err = app.updateUserPassword(usr, newPassword)
+	err = app.updateUserPassword(*usr, newPassword)
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
-	app.tokens.updateUser(usr)
+	app.tokens.updateUser(*usr)
 	http.Redirect(w, r, "/logout/", http.StatusSeeOther)
 }
 
@@ -381,7 +381,7 @@ func (app *application) deleteUserPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.deleteUser(usr)
+	err = app.deleteUser(*usr)
 	if err != nil {
 		app.serverError(w, err)
 		return

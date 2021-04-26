@@ -15,14 +15,14 @@ func newMapTokens() *MapTokens {
 }
 
 //Обновление, передается пользователь, если он есть в карте, то обновляются его данные
-func (m *MapTokens) updateUser(u *User) {
+func (m *MapTokens) updateUser(u User) {
 	id := u.Id
 
 	//Если его нет в карте, то ничего не делается
 	if (*m)[id] == nil {
 		return
 	}
-	(*m)[id].User = *u
+	(*m)[id].User = u
 }
 
 //Добавление, передается пользователь и токен
