@@ -170,23 +170,23 @@ func (app *application) signInPagePOST(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//auth user
-	u := app.getUserByEmail(email)
-	if u == nil || u.comparePassword(password) != nil {
+	usr := app.getUserByEmail(email)
+	if usr == nil || usr.comparePassword(password) != nil {
 		http.Redirect(w, r, "/signIn/", http.StatusSeeOther)
 		return
 	}
-	genToken, err := app.generateToken(strconv.Itoa(u.Id))
+	genToken, err := app.generateToken(strconv.Itoa(usr.Id))
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
 	tkn := Token{
-		IdUser: u.Id,
+		IdUser: usr.Id,
 		Token:  genToken,
 	}
-	app.saveToken(w, *u, tkn)
-	app.infoLog.Println("Пользователь вошел:", email, "\tid:", u.Id)
+	app.saveToken(w, *usr, tkn)
+	app.infoLog.Println("Пользователь вошел:", email, "\tid:", usr.Id)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
